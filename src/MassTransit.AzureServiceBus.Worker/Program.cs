@@ -39,7 +39,7 @@ namespace MassTransit.AzureServiceBus.Worker
                             cfg.Host(hostContext.Configuration.GetConnectionString("AzureServiceBus"));
 
                             //Configura Endpoint da fila principal
-                            cfg.ReceiveEndpoint("mt-mes-lotes-subscriber", e =>
+                            cfg.ReceiveEndpoint("masstransit-mes-lotes-subscriber", e =>
                             {
                                 //Tenta entregar a mensagem ao consumidor 1 vez antes de lançar a exceção no pipeline - fila de erros
                                 e.UseMessageRetry(r => r.Immediate(1));
@@ -49,7 +49,7 @@ namespace MassTransit.AzureServiceBus.Worker
                             });
 
                             //Configura Endpoint da fila de erros e falhas
-                            cfg.ReceiveEndpoint("mt-mes-lotes-dead-letter", e =>
+                            cfg.ReceiveEndpoint("masstransit-mes-lotes-dead-letter", e =>
                             {
                                 e.ConfigureConsumer<LoteFaultConsumer>(context);
                             });
@@ -57,11 +57,11 @@ namespace MassTransit.AzureServiceBus.Worker
                             //Configura a mensagem que sera enviada para o tópico
                             cfg.Message<LoteSchemaCriadoEvent>(configTopology =>
                             {
-                                configTopology.SetEntityName("mt-mes-lotes-publisher");
+                                configTopology.SetEntityName("masstransit-mes-lotes-publisher");
                             });
 
                             //Configura a assinatura e o consumidor
-                            cfg.SubscriptionEndpoint<LoteSchemaCriadoEvent>("mt-notificacao-lotes-subscriber", endpointConfig =>
+                            cfg.SubscriptionEndpoint<LoteSchemaCriadoEvent>("masstransit-notificacao-lotes-subscriber", endpointConfig =>
                             {
                                 endpointConfig.ConfigureConsumer<NotificacaoLoteConsumer>(context);
                             });

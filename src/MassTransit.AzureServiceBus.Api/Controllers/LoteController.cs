@@ -8,8 +8,8 @@ namespace MassTransit.AzureServiceBus.Api.Controllers
     [Route("api/[controller]")]
     public class LoteController : Controller
     {
-        private const string URI_QUEUE = "sb://athena-sbus-dev-brazilsouth-001.servicebus.windows.net/mes-lotes-subscriber";
-        private const string URI_FAULT_QUEUE = "sb://athena-sbus-dev-brazilsouth-001.servicebus.windows.net/mes-lotes-dead-letter";
+        private const string URI_QUEUE = "sb://athena-sbus-dev-brazilsouth-001.servicebus.windows.net/masstransit-mes-lotes-subscriber";
+        private const string URI_FAULT_QUEUE = "sb://athena-sbus-dev-brazilsouth-001.servicebus.windows.net/masstransit-mes-lotes-dead-letter";
 
         private readonly ISendEndpointProvider _sendEndpointProvider;
 
