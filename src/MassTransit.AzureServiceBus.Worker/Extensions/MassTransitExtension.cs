@@ -17,6 +17,7 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
                 x.AddConsumer<LoteConsumer>();
                 x.AddConsumer<LoteFaultConsumer>();
                 x.AddConsumer<LoteRecalculadoConsumer>();
+                x.AddConsumer<LoteCalculadoConsumer>();
 
                 x.UsingAzureServiceBus((context, cfg) =>
                 {
@@ -46,6 +47,16 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
                     cfg.SubscriptionEndpoint<LoteRecalculadoEvent>("masstransit-notificacao-recalculo-lotes-subscriber", endpointConfig =>
                     {
                         endpointConfig.ConfigureConsumer<LoteRecalculadoConsumer>(context);
+                    });
+
+                    cfg.Message<LoteCalculadoEvent>(configTopology =>
+                    {
+                        configTopology.SetEntityName("masstransit-mes-lotes-publisher");
+                    });
+
+                    cfg.SubscriptionEndpoint<LoteCalculadoEvent>("masstransit-lote-calculado-subscriber", endpointConfig =>
+                    {
+                        endpointConfig.ConfigureConsumer<LoteCalculadoConsumer>(context);
                     });
                 });
             });

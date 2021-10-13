@@ -50,9 +50,31 @@ namespace MassTransit.AzureServiceBus.Api.Controllers
             {
                 LoteId = NewId.NextGuid()
             }, context => {
-                context.Headers.Set("notificacao-id", "30879c69-702b-4532-bb27-c6c479660e75");
-                context.Headers.Set("recalculoLote-id", "4396038d-7cbb-4a29-8225-7afd383f8f15");
+                context.Headers.Set("NotificacaoId", "30879c69-702b-4532-bb27-c6c479660e75");
+                context.Headers.Set("RecalculoLoteId", "4396038d-7cbb-4a29-8225-7afd383f8f15");
             });
+
+            return Ok();
+        }
+
+        [HttpPost, Route("PublicarLoteCalculado")]
+        public async Task<IActionResult> PublicarLoteCalculado()
+        {
+            await _publishEndpoint.Publish<LoteCalculadoEvent>(new
+            {
+                LoteId = NewId.NextGuid()
+            }, context =>
+            {
+                context.Headers.Set("NotificacaoId", "30879c69-702b-4532-bb27-c6c479660e75");
+                context.Headers.Set("RecalculoLoteId", "4396038d-7cbb-4a29-8225-7afd383f8f15");
+            });
+
+            //await _publishEndpoint.Publish<LoteCalculadoEvent>(new
+            //{
+            //    LoteId = NewId.NextGuid()
+            //}, context => {
+            //    context.Headers.Set("RecalculoLoteId", "4396038d-7cbb-4a29-8225-7afd383f8f15");
+            //});
 
             return Ok();
         }
