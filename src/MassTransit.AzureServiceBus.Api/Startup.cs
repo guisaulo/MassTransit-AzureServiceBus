@@ -1,6 +1,4 @@
-using MassTransit.AzureServiceBus.Contracts;
-using MassTransit.AzureServiceBus.Contracts.Comandos;
-using MassTransit.AzureServiceBus.Contracts.Eventos;
+using MassTransit.AzureServiceBus.Api.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,12 +10,12 @@ namespace MassTransit.AzureServiceBus.Api
 {
     public class Startup
     {
+        public IConfiguration _configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -34,30 +32,7 @@ namespace MassTransit.AzureServiceBus.Api
                 });
             });
 
-            services.AddMassTransit(x =>
-            {
-                //Configura o tipo de formatação dos endpoints
-                x.SetKebabCaseEndpointNameFormatter();
-
-                x.UsingAzureServiceBus((_, cfg) =>
-                {
-                    cfg.Host(Configuration.GetConnectionString("AzureServiceBus"));
-
-                    //Configura Topologia das mensagens para uma fila especifica
-                    cfg.Message<CriarLoteSchemaCommand>(cfgTopology =>
-                    {
-                        cfgTopology.SetEntityName("masstransit-mes-lotes-subscriber");
-                    });
-
-                    //Configura Topologia das mensagens para uma fila especifica
-                    cfg.Message<LoteRecalculadoEvent>(cfgTopology =>
-                    {
-                        cfgTopology.SetEntityName("mes-lotes-publisher");
-                    });
-                });
-            });
-
-            services.AddMassTransitHostedService();
+            services.AddMassTransitExtension(_configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
