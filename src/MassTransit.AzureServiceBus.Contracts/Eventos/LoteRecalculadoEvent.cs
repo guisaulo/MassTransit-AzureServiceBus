@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace MassTransit.AzureServiceBus.Contracts
+namespace MassTransit.AzureServiceBus.Contracts.Eventos
 {
-    public interface RecalculoLoteEvent
+    public interface LoteRecalculadoEvent
     {
-        Guid LoteId { get; }
-        bool Success { get; }
-        string Origem { get; }
+        Guid NotificacaoId { get; }
+        Guid RecalculoLoteId { get; }
     }
 }

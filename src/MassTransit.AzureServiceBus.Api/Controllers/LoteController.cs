@@ -1,4 +1,6 @@
 ﻿using MassTransit.AzureServiceBus.Contracts;
+using MassTransit.AzureServiceBus.Contracts.Comandos;
+using MassTransit.AzureServiceBus.Contracts.Eventos;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -12,14 +14,16 @@ namespace MassTransit.AzureServiceBus.Api.Controllers
         private const string URI_FAULT_QUEUE = "sb://athena-sbus-dev-brazilsouth-001.servicebus.windows.net/masstransit-mes-lotes-dead-letter";
 
         private readonly ISendEndpointProvider _sendEndpointProvider;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public LoteController(ISendEndpointProvider sendEndpointProvider)
+        public LoteController(ISendEndpointProvider sendEndpointProvider, IPublishEndpoint publishEndpoint)
         {
             _sendEndpointProvider = sendEndpointProvider;
+            _publishEndpoint = publishEndpoint;
         }
 
-        [HttpPost, Route("Sender")]
-        public async Task<IActionResult> SendCommand()
+        [HttpPost, Route("CriarLoteSchema")]
+        public async Task<IActionResult> CriarLoteSchema()
         {
             var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri(URI_QUEUE));
 
@@ -35,6 +39,18 @@ namespace MassTransit.AzureServiceBus.Api.Controllers
                 context.TimeToLive = TimeSpan.Parse("5000");
                 context.FaultAddress = new Uri(URI_FAULT_QUEUE);
             });
+
+            return Ok();
+        }
+
+        [HttpPost, Route("PublicarLoteRecalculado")]
+        public async Task<IActionResult> PublicarLoteRecalculado()
+        {
+            await _publishEndpoint.Publish<LoteRecalculadoEvent>(new
+            {
+                NotificacaoId = NewId.NextGuid(),
+                RecalculoLoteId = NewId.NextGuid(),
+            }, context => context.Headers.Set("teste_notificacao", "123"));
 
             return Ok();
         }

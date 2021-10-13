@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MassTransit.AzureServiceBus.Contracts
+namespace MassTransit.AzureServiceBus.Contracts.Comandos
 {
     public interface CriarLoteSchemaCommand
     {

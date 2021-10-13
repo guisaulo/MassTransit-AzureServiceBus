@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MassTransit.AzureServiceBus.Worker.Consumers
 {
-    public class NotificacaoLoteConsumer : IConsumer<LoteSchemaCriadoEvent>
+    public class NotificacaoLoteSchemaConsumer : IConsumer<LoteSchemaCriadoEvent>
     {
         public Task Consume(ConsumeContext<LoteSchemaCriadoEvent> context)
         {

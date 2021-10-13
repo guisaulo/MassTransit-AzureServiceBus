@@ -1,4 +1,6 @@
 using MassTransit.AzureServiceBus.Contracts;
+using MassTransit.AzureServiceBus.Contracts.Comandos;
+using MassTransit.AzureServiceBus.Contracts.Eventos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -45,6 +47,12 @@ namespace MassTransit.AzureServiceBus.Api
                     cfg.Message<CriarLoteSchemaCommand>(cfgTopology =>
                     {
                         cfgTopology.SetEntityName("masstransit-mes-lotes-subscriber");
+                    });
+
+                    //Configura Topologia das mensagens para uma fila especifica
+                    cfg.Message<LoteRecalculadoEvent>(cfgTopology =>
+                    {
+                        cfgTopology.SetEntityName("mes-lotes-publisher");
                     });
                 });
             });

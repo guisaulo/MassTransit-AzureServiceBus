@@ -32,7 +32,8 @@ namespace MassTransit.AzureServiceBus.Worker
 
                         x.AddConsumer<LoteConsumer>();
                         x.AddConsumer<LoteFaultConsumer>();
-                        x.AddConsumer<NotificacaoLoteConsumer>();
+                        x.AddConsumer<NotificacaoLoteSchemaConsumer>();
+                        x.AddConsumer<LoteRecalculadoConsumer>();
 
                         x.UsingAzureServiceBus((context, cfg) =>
                         {
@@ -57,13 +58,23 @@ namespace MassTransit.AzureServiceBus.Worker
                             //Configura a mensagem que sera enviada para o tópico
                             cfg.Message<LoteSchemaCriadoEvent>(configTopology =>
                             {
-                                configTopology.SetEntityName("masstransit-mes-lotes-publisher");
+                                configTopology.SetEntityName("masstransit-mes-notificacao-lote-schema-publisher");
                             });
 
                             //Configura a assinatura e o consumidor
-                            cfg.SubscriptionEndpoint<LoteSchemaCriadoEvent>("masstransit-notificacao-lotes-subscriber", endpointConfig =>
+                            cfg.SubscriptionEndpoint<LoteSchemaCriadoEvent>("masstransit-notificacao-lote-schema-subscriber", endpointConfig =>
                             {
-                                endpointConfig.ConfigureConsumer<NotificacaoLoteConsumer>(context);
+                                endpointConfig.ConfigureConsumer<NotificacaoLoteSchemaConsumer>(context);
+                            });
+
+                            cfg.Message<LoteRecalculadoEvent>(configTopology =>
+                            {
+                                configTopology.SetEntityName("mes-lotes-publisher");
+                            });
+
+                            cfg.SubscriptionEndpoint<LoteRecalculadoEvent>("masstransit-notificacao-recalculo-lotes-subscriber", endpointConfig =>
+                            {
+                                endpointConfig.ConfigureConsumer<LoteRecalculadoConsumer>(context);
                             });
                         });
                     });

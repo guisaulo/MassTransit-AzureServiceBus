@@ -1,4 +1,4 @@
-﻿using MassTransit.AzureServiceBus.Contracts;
+﻿using MassTransit.AzureServiceBus.Contracts.Comandos;
 using System;
 using System.Threading.Tasks;
 
