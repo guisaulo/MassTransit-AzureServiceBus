@@ -21,13 +21,13 @@ namespace MassTransit.AzureServiceBus.Api.Extensions
                     //Configura Topologia das mensagens para uma fila especifica
                     cfg.Message<CriarLoteSchemaCommand>(cfgTopology =>
                     {
-                        cfgTopology.SetEntityName("masstransit-mes-lotes-subscriber");
+                        cfgTopology.SetEntityName("masstransit-mes-lotes-queue");
                     });
 
                     //Configura Topologia das mensagens para uma fila especifica
                     cfg.Message<LoteRecalculadoEvent>(cfgTopology =>
                     {
-                        cfgTopology.SetEntityName("mes-lotes-publisher");
+                        cfgTopology.SetEntityName("masstransit-mes-lotes-publisher");
                     });
 
                     cfg.ConfigureEndpoints(context);

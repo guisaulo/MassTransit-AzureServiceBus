@@ -20,13 +20,6 @@ namespace MassTransit.AzureServiceBus.Worker.Consumers
                 + $"LoteId: {context.Message.LoteId} "
                 + $"Numero: {context.Message.Numero}");
 
-            _publishEndpoint.Publish<LoteSchemaCriadoEvent>(new
-            {
-                context.Message.LoteId,
-                context.Message.Numero,
-                CreateDate = DateTime.Now
-            });
-
             return Task.CompletedTask;
 
             //Descomentar para simular um erro

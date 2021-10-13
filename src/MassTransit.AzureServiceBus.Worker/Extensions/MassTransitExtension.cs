@@ -16,7 +16,6 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
 
                 x.AddConsumer<LoteConsumer>();
                 x.AddConsumer<LoteFaultConsumer>();
-                x.AddConsumer<NotificacaoLoteSchemaConsumer>();
                 x.AddConsumer<LoteRecalculadoConsumer>();
 
                 x.UsingAzureServiceBus((context, cfg) =>
@@ -24,7 +23,7 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
                     cfg.Host(configuration.GetConnectionString("AzureServiceBus"));
 
                     //Configura Endpoint da fila principal
-                    cfg.ReceiveEndpoint("masstransit-mes-lotes-subscriber", e =>
+                    cfg.ReceiveEndpoint("masstransit-mes-lotes-queue", e =>
                     {
                         //Tenta entregar a mensagem ao consumidor 1 vez antes de lançar a exceção no pipeline - fila de erros
                         e.UseMessageRetry(r => r.Immediate(1));
@@ -34,26 +33,14 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
                     });
 
                     //Configura Endpoint da fila de erros e falhas
-                    cfg.ReceiveEndpoint("masstransit-mes-lotes-dead-letter", e =>
+                    cfg.ReceiveEndpoint("masstransit-mes-lotes-dead-letter-queue", e =>
                     {
                         e.ConfigureConsumer<LoteFaultConsumer>(context);
                     });
 
-                    //Configura a mensagem que sera enviada para o tópico
-                    cfg.Message<LoteSchemaCriadoEvent>(configTopology =>
-                    {
-                        configTopology.SetEntityName("masstransit-mes-notificacao-lote-schema-publisher");
-                    });
-
-                    //Configura a assinatura e o consumidor
-                    cfg.SubscriptionEndpoint<LoteSchemaCriadoEvent>("masstransit-notificacao-lote-schema-subscriber", endpointConfig =>
-                    {
-                        endpointConfig.ConfigureConsumer<NotificacaoLoteSchemaConsumer>(context);
-                    });
-
                     cfg.Message<LoteRecalculadoEvent>(configTopology =>
                     {
-                        configTopology.SetEntityName("mes-lotes-publisher");
+                        configTopology.SetEntityName("masstransit-mes-lotes-publisher");
                     });
 
                     cfg.SubscriptionEndpoint<LoteRecalculadoEvent>("masstransit-notificacao-recalculo-lotes-subscriber", endpointConfig =>
