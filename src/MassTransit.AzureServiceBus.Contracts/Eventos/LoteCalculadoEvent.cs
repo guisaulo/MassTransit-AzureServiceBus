@@ -2,7 +2,7 @@
 
 namespace MassTransit.AzureServiceBus.Contracts.Eventos
 {
-    public interface LoteRecalculadoEvent
+    public interface LoteCalculadoEvent
     {
         Guid LoteId { get; }
     }

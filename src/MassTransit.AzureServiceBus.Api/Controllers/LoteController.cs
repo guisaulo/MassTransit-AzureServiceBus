@@ -48,9 +48,11 @@ namespace MassTransit.AzureServiceBus.Api.Controllers
         {
             await _publishEndpoint.Publish<LoteRecalculadoEvent>(new
             {
-                NotificacaoId = NewId.NextGuid(),
-                RecalculoLoteId = NewId.NextGuid(),
-            }, context => context.Headers.Set("teste_notificacao", "123"));
+                LoteId = NewId.NextGuid()
+            }, context => {
+                context.Headers.Set("notificacao-id", "30879c69-702b-4532-bb27-c6c479660e75");
+                context.Headers.Set("recalculoLote-id", "4396038d-7cbb-4a29-8225-7afd383f8f15");
+            });
 
             return Ok();
         }
