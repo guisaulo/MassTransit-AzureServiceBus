@@ -34,6 +34,11 @@ namespace MassTransit.AzureServiceBus.Api.Extensions
                         cfgTopology.SetEntityName("masstransit-mes-lotes-publisher");
                     });
 
+                    cfg.Message<IEventMessage>(cfgTopology =>
+                    {
+                        cfgTopology.SetEntityName("masstransit-teste-filter");
+                    });
+
                     cfg.ConfigureEndpoints(context);
                 });
             });

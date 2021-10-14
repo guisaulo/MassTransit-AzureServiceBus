@@ -78,5 +78,16 @@ namespace MassTransit.AzureServiceBus.Api.Controllers
 
             return Ok();
         }
+
+        [HttpPost, Route("PublicarEventCode")]
+        public async Task<IActionResult> PublicarEventCode()
+        {
+            await _publishEndpoint.Publish<IEventMessage>(new
+            {
+                EventCode = 123
+            }, context => context.Headers.Set("EventCode", "123"));
+
+            return Ok();
+        }
     }
 }

@@ -26,6 +26,12 @@ namespace MassTransit.AzureServiceBus.Worker.Consumers
             //throw new Exception($"Houve um erro ao consumir a mensagem: "
             //    + $"CorrelationId: {context.CorrelationId}"
             //    + $"LoteId: {context.Message.LoteId}");
+            //    OlaMundo();
+        }
+
+        public void OlaMundo()
+        {
+            OlaMundo();
         }
     }
 }

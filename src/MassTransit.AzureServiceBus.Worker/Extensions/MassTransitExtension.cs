@@ -1,6 +1,7 @@
 ﻿using GreenPipes;
 using MassTransit.AzureServiceBus.Contracts.Eventos;
 using MassTransit.AzureServiceBus.Worker.Consumers;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,7 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
                 x.AddConsumer<LoteFaultConsumer>();
                 x.AddConsumer<LoteRecalculadoConsumer>();
                 x.AddConsumer<LoteCalculadoConsumer>();
+                x.AddConsumer<EventCodeConsumer>();
 
                 x.UsingAzureServiceBus((context, cfg) =>
                 {
@@ -27,7 +29,7 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
                     cfg.ReceiveEndpoint("masstransit-mes-lotes-queue", e =>
                     {
                         //Tenta entregar a mensagem ao consumidor 1 vez antes de lançar a exceção no pipeline - fila de erros
-                        e.UseMessageRetry(r => r.Immediate(1));
+                        e.UseMessageRetry(r => r.Immediate(5));
                         //Descartar criação de filas automaticas de erros e faltas
                         e.DiscardFaultedMessages();
                         e.ConfigureConsumer<LoteConsumer>(context);
@@ -57,6 +59,22 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
                     cfg.SubscriptionEndpoint<LoteCalculadoEvent>("masstransit-lote-calculado-subscriber", endpointConfig =>
                     {
                         endpointConfig.ConfigureConsumer<LoteCalculadoConsumer>(context);
+                    });
+
+                    cfg.Message<IEventMessage>(cfgTopology =>
+                    {
+                        cfgTopology.SetEntityName("masstransit-teste-filter");
+                    });
+
+                    cfg.SubscriptionEndpoint<IEventMessage>("masstransit-teste-filter-subscriber", endpointConfig =>
+                    {
+                        endpointConfig.Rule = new RuleDescription() { 
+                            Name = "masstransit-filter", 
+                            Filter = new SqlFilter("EventCode = '123'") 
+                        };
+                        endpointConfig.ConfigureConsumer<EventCodeConsumer>(context);
+                        //endpointConfig.ConfigureConsumer<EventCodeConsumer>(context, x =>
+                        //    x.ConsumerMessage<IEventMessage>(p => p.UseFilter(new EventCodeFilter<EventCodeConsumer>())));
                     });
                 });
             });
