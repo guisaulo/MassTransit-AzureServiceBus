@@ -8,8 +8,7 @@ namespace MassTransit.AzureServiceBus.Worker.Consumers
     {
         public Task Consume(ConsumeContext<LoteRecalculadoEvent> context)
         {
-            Console.Out.WriteLineAsync($"Nova mensagem de evento recebida: "
-                + $"LoteId: {context.Message.LoteId}");
+            Console.Out.WriteLineAsync($"Nova mensagem de evento recebida, LoteId: {context.Message.LoteId}");
 
             return Task.CompletedTask;
         }

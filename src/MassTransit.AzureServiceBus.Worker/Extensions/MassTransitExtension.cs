@@ -19,23 +19,18 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
                 x.AddConsumer<LoteFaultConsumer>();
                 x.AddConsumer<LoteRecalculadoConsumer>();
                 x.AddConsumer<LoteCalculadoConsumer>();
-                x.AddConsumer<EventCodeConsumer>();
 
                 x.UsingAzureServiceBus((context, cfg) =>
                 {
                     cfg.Host(configuration.GetConnectionString("AzureServiceBus"));
 
-                    //Configura Endpoint da fila principal
                     cfg.ReceiveEndpoint("masstransit-mes-lotes-queue", e =>
                     {
-                        //Tenta entregar a mensagem ao consumidor 1 vez antes de lançar a exceção no pipeline - fila de erros
                         e.UseMessageRetry(r => r.Immediate(5));
-                        //Descartar criação de filas automaticas de erros e faltas
                         e.DiscardFaultedMessages();
                         e.ConfigureConsumer<LoteConsumer>(context);
                     });
 
-                    //Configura Endpoint da fila de erros e falhas
                     cfg.ReceiveEndpoint("masstransit-mes-lotes-dead-letter-queue", e =>
                     {
                         e.ConfigureConsumer<LoteFaultConsumer>(context);
@@ -48,6 +43,15 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
 
                     cfg.SubscriptionEndpoint<LoteRecalculadoEvent>("masstransit-notificacao-recalculo-lotes-subscriber", endpointConfig =>
                     {
+                        var filter = new CorrelationFilter();
+                        filter.Properties["notificacaoId"] = "30879c69-702b-4532-bb27-c6c479660e75";
+                        filter.Properties["recalculoLoteId"] = "4396038d-7cbb-4a29-8225-7afd383f8f15";
+
+                        endpointConfig.Rule = new RuleDescription()
+                        {
+                            Name = "masstransit-filter",
+                            Filter = filter
+                        };
                         endpointConfig.ConfigureConsumer<LoteRecalculadoConsumer>(context);
                     });
 
@@ -58,23 +62,12 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
 
                     cfg.SubscriptionEndpoint<LoteCalculadoEvent>("masstransit-lote-calculado-subscriber", endpointConfig =>
                     {
-                        endpointConfig.ConfigureConsumer<LoteCalculadoConsumer>(context);
-                    });
-
-                    cfg.Message<IEventMessage>(cfgTopology =>
-                    {
-                        cfgTopology.SetEntityName("masstransit-teste-filter");
-                    });
-
-                    cfg.SubscriptionEndpoint<IEventMessage>("masstransit-teste-filter-subscriber", endpointConfig =>
-                    {
-                        endpointConfig.Rule = new RuleDescription() { 
-                            Name = "masstransit-filter", 
-                            Filter = new SqlFilter("EventCode = '123'") 
+                        endpointConfig.Rule = new RuleDescription()
+                        {
+                            Name = "masstransit-filter",
+                            Filter = new SqlFilter("NotificacaoId IS NOT NULL AND RecalculoLoteId IS NOT NULL")
                         };
-                        endpointConfig.ConfigureConsumer<EventCodeConsumer>(context);
-                        //endpointConfig.ConfigureConsumer<EventCodeConsumer>(context, x =>
-                        //    x.ConsumerMessage<IEventMessage>(p => p.UseFilter(new EventCodeFilter<EventCodeConsumer>())));
+                        endpointConfig.ConfigureConsumer<LoteCalculadoConsumer>(context);
                     });
                 });
             });

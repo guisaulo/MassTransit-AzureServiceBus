@@ -1,5 +1,4 @@
-﻿using MassTransit.AzureServiceBus.Contracts;
-using MassTransit.AzureServiceBus.Contracts.Comandos;
+﻿using MassTransit.AzureServiceBus.Contracts.Comandos;
 using MassTransit.AzureServiceBus.Contracts.Eventos;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -22,12 +21,11 @@ namespace MassTransit.AzureServiceBus.Api.Controllers
             _publishEndpoint = publishEndpoint;
         }
 
-        [HttpPost, Route("CriarLoteSchema")]
-        public async Task<IActionResult> CriarLoteSchema()
+        [HttpPost, Route("GerarLoteSchemaCommand")]
+        public async Task<IActionResult> GerarLoteSchemaCommand()
         {
             var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri(URI_QUEUE));
 
-            ////context contém os headers do envelope de mensagem
             await sendEndpoint.Send<CriarLoteSchemaCommand>(new
             {
                 LoteId = NewId.NextGuid(),
@@ -35,16 +33,14 @@ namespace MassTransit.AzureServiceBus.Api.Controllers
                 CreatedDate = DateTime.UtcNow
             }, context =>
             {
-                context.CorrelationId = NewId.NextGuid();
-                context.TimeToLive = TimeSpan.Parse("5000");
                 context.FaultAddress = new Uri(URI_FAULT_QUEUE);
             });
 
             return Ok();
         }
 
-        [HttpPost, Route("PublicarLoteRecalculado")]
-        public async Task<IActionResult> PublicarLoteRecalculado()
+        [HttpPost, Route("GerarLoteRecalculadoEvent")]
+        public async Task<IActionResult> GerarLoteRecalculadoEvent()
         {
             await _publishEndpoint.Publish<LoteRecalculadoEvent>(new
             {
@@ -57,8 +53,8 @@ namespace MassTransit.AzureServiceBus.Api.Controllers
             return Ok();
         }
 
-        [HttpPost, Route("PublicarLoteCalculado")]
-        public async Task<IActionResult> PublicarLoteCalculado()
+        [HttpPost, Route("GerarLoteCalculadoEvent")]
+        public async Task<IActionResult> GerarLoteCalculadoEvent()
         {
             await _publishEndpoint.Publish<LoteCalculadoEvent>(new
             {
@@ -68,24 +64,6 @@ namespace MassTransit.AzureServiceBus.Api.Controllers
                 context.Headers.Set("NotificacaoId", "30879c69-702b-4532-bb27-c6c479660e75");
                 context.Headers.Set("RecalculoLoteId", "4396038d-7cbb-4a29-8225-7afd383f8f15");
             });
-
-            //await _publishEndpoint.Publish<LoteCalculadoEvent>(new
-            //{
-            //    LoteId = NewId.NextGuid()
-            //}, context => {
-            //    context.Headers.Set("RecalculoLoteId", "4396038d-7cbb-4a29-8225-7afd383f8f15");
-            //});
-
-            return Ok();
-        }
-
-        [HttpPost, Route("PublicarEventCode")]
-        public async Task<IActionResult> PublicarEventCode()
-        {
-            await _publishEndpoint.Publish<IEventMessage>(new
-            {
-                EventCode = 123
-            }, context => context.Headers.Set("EventCode", "123"));
 
             return Ok();
         }

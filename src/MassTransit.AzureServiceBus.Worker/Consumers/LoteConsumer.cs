@@ -1,5 +1,4 @@
 ﻿using MassTransit.AzureServiceBus.Contracts.Comandos;
-using MassTransit.AzureServiceBus.Contracts.Eventos;
 using System;
 using System.Threading.Tasks;
 
@@ -7,31 +6,29 @@ namespace MassTransit.AzureServiceBus.Worker.Consumers
 {
     public class LoteConsumer : IConsumer<CriarLoteSchemaCommand>
     {
-        public readonly IPublishEndpoint _publishEndpoint;
-        public LoteConsumer(IPublishEndpoint publishEndpoint)
-        {
-            _publishEndpoint = publishEndpoint;
-        }
-
         public Task Consume(ConsumeContext<CriarLoteSchemaCommand> context)
         {
-            Console.Out.WriteLineAsync($"Nova mensagem de comando recebida: "
-                + $"CorrelationId: {context.CorrelationId} "
-                + $"LoteId: {context.Message.LoteId} "
-                + $"Numero: {context.Message.Numero}");
+            try
+            {
+                Console.Out.WriteLineAsync($"Nova mensagem de comando recebida: "
+                    + $"LoteId: {context.Message.LoteId} "
+                    + $"Numero: {context.Message.Numero} "
+                    + $"CreatedDate: {context.Message.CreateDate}");
 
-            return Task.CompletedTask;
+                return Task.CompletedTask;
 
-            //Descomentar para simular um erro
-            //throw new Exception($"Houve um erro ao consumir a mensagem: "
-            //    + $"CorrelationId: {context.CorrelationId}"
-            //    + $"LoteId: {context.Message.LoteId}");
-            //    OlaMundo();
+                //throw new Exception($"Houve um erro ao consumir a mensagem de comando");
+                //GerarRecursao();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
-        public void OlaMundo()
+        public void GerarRecursao()
         {
-            OlaMundo();
+            GerarRecursao();
         }
     }
 }
