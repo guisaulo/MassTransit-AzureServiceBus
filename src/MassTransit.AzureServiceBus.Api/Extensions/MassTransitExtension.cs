@@ -11,11 +11,14 @@ namespace MassTransit.AzureServiceBus.Api.Extensions
         {
             services.AddMassTransit(x =>
             {
-                x.SetKebabCaseEndpointNameFormatter();
-
                 x.UsingAzureServiceBus((context, cfg) =>
                 {
                     cfg.Host(configuration.GetConnectionString("AzureServiceBus"));
+
+                    cfg.Message<UnidadeTipoLoteEvent>(cfgTopology =>
+                    {
+                        cfgTopology.SetEntityName("masstransitunidade.032.tipolote.1.id.4396038d-7cbb-4a29-8225-7afd383f8f15");
+                    });
 
                     cfg.Message<CriarLoteSchemaCommand>(cfgTopology =>
                     {

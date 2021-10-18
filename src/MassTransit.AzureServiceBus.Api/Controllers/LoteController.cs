@@ -21,6 +21,19 @@ namespace MassTransit.AzureServiceBus.Api.Controllers
             _publishEndpoint = publishEndpoint;
         }
 
+        [HttpPost, Route("GerarUnidadeTipoLoteEvent")]
+        public async Task<IActionResult> GerarUnidadeTipoLoteEvent()
+        {
+            await _publishEndpoint.Publish<UnidadeTipoLoteEvent>(new
+            {
+                Id = new Guid("4396038d-7cbb-4a29-8225-7afd383f8f15"),
+                Unidade = 032,
+                TipoLote = 1
+            });
+
+            return Ok();
+        }
+
         [HttpPost, Route("GerarLoteSchemaCommand")]
         public async Task<IActionResult> GerarLoteSchemaCommand()
         {

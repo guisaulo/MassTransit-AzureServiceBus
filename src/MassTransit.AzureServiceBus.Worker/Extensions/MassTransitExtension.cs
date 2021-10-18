@@ -13,8 +13,7 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
         {
             services.AddMassTransit(x =>
             {
-                x.SetKebabCaseEndpointNameFormatter();
-
+                x.AddConsumer<UnidadeTipoLoteConsumer>();
                 x.AddConsumer<LoteConsumer>();
                 x.AddConsumer<LoteFaultConsumer>();
                 x.AddConsumer<LoteRecalculadoConsumer>();
@@ -23,6 +22,16 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
                 x.UsingAzureServiceBus((context, cfg) =>
                 {
                     cfg.Host(configuration.GetConnectionString("AzureServiceBus"));
+
+                    cfg.Message<UnidadeTipoLoteEvent>(cfgTopology =>
+                    {
+                        cfgTopology.SetEntityName("masstransitunidade.032.tipolote.1.id.4396038d-7cbb-4a29-8225-7afd383f8f15");
+                    });
+
+                    cfg.SubscriptionEndpoint<UnidadeTipoLoteEvent>("masstransit-unidade-tipolote-subscriber", endpointConfig =>
+                    {
+                        endpointConfig.ConfigureConsumer<UnidadeTipoLoteConsumer>(context);
+                    });
 
                     cfg.ReceiveEndpoint("masstransit-mes-lotes-queue", e =>
                     {
