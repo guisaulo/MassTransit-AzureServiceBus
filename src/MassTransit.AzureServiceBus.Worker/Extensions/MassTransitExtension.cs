@@ -35,7 +35,7 @@ namespace MassTransit.AzureServiceBus.Worker.Extensions
 
                     cfg.ReceiveEndpoint("masstransit-mes-lotes-queue", e =>
                     {
-                        e.UseMessageRetry(r => r.Immediate(5));
+                        e.UseMessageRetry(r => r.Immediate(1));
                         e.DiscardFaultedMessages();
                         e.ConfigureConsumer<LoteConsumer>(context);
                     });
